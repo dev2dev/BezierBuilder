@@ -18,9 +18,9 @@
 	for (NSUInteger i = 0; i < [points count]; ++i) {
 		BezierPoint *point = [points objectAtIndex:i];
 		if (i == 0) {
-			[lines addObject:[NSString stringWithFormat:@"[bp moveToPoint:NSMakePoint(%f, %f)]", [point mainPoint].x, [point mainPoint].y]];
+			[lines addObject:[NSString stringWithFormat:@"[bp moveToPoint:NSMakePoint(%0.2f, %0.2f)]", [point mainPoint].x, [point mainPoint].y]];
 		} else {
-			[lines addObject:[NSString stringWithFormat:@"[bp curveToPoint:NSMakePoint(%f, %f) controlPoint1:NSMakePoint(%f, %f) controlPoint2:NSMakePoint(%f, %f)];", 
+			[lines addObject:[NSString stringWithFormat:@"[bp curveToPoint:NSMakePoint(%0.2f, %0.2f) controlPoint1:NSMakePoint(%0.2f, %0.2f) controlPoint2:NSMakePoint(%0.2f, %0.2f)];", 
 							  [point mainPoint].x, [point mainPoint].y,
 							  [point controlPoint1].x, [point controlPoint1].y,
 							  [point controlPoint2].x, [point controlPoint2].y]];

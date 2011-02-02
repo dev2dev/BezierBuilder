@@ -16,9 +16,6 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 	return sqrt(dx2 + dy2);
 }
 
-NSPoint NSDifferenceFromPointToPoint(NSPoint point1, NSPoint point2) {
-	return NSMakePoint(point1.x - point2.x, point1.y - point2.y);
-}
 
 @implementation BezierView
 
@@ -69,41 +66,42 @@ NSPoint NSDifferenceFromPointToPoint(NSPoint point1, NSPoint point2) {
 	BOOL isShiftDown = ([event modifierFlags] & NSShiftKeyMask) > 0;
 	BezierPoint *point = [bezierPoints objectAtIndex:editingPoint.x];
 	
-	NSPoint mainTo1Diff = NSDifferenceFromPointToPoint([point mainPoint], [point controlPoint1]);
-	NSPoint mainTo2Diff = NSDifferenceFromPointToPoint([point mainPoint], [point controlPoint1]);
+	NSPoint mainTo2Diff = NSPointSubtractPoint([point mainPoint], [point controlPoint2]);
 	
 	if (editingPoint.y <= 0) {
 		[point setMainPoint:p];
-		if (isShiftDown || editingPoint.y < 0) {
-			p.x = [point mainPoint].x - mainTo1Diff.x;
-			p.y = [point mainPoint].y - mainTo1Diff.y;
-			[point setControlPoint1:p];
-			
-			p.x = [point mainPoint].x + mainTo2Diff.x;
-			p.y = [point mainPoint].y + mainTo2Diff.y;
+		if (editingPoint.y < 0) {
+			// If we're dragging around a new current point, update all the control points
+			if (editingPoint.x > 0 && editingPoint.x == [bezierPoints count] - 1) {
+				BezierPoint *lastPoint = [bezierPoints objectAtIndex:editingPoint.x - 1];
+				CGPoint lastMain = [lastPoint mainPoint];
+				CGPoint currMain = [point mainPoint];
+				
+				p = NSMakePoint(lastMain.x * 0.7 + currMain.x * (1 - 0.7),
+								lastMain.y * 0.7 + currMain.y * (1 - 0.7));
+				[point setControlPoint1:p];
+				
+				p = NSMakePoint(lastMain.x * 0.3 + currMain.x * (1 - 0.3),
+								lastMain.y * 0.3 + currMain.y * (1 - 0.3));
+				[point setControlPoint2:p];
+			}
+		}
+		else if (isShiftDown) {
+			p.x = [point mainPoint].x - mainTo2Diff.x;
+			p.y = [point mainPoint].y - mainTo2Diff.y;
 			[point setControlPoint2:p];
 		}
 	} else if (editingPoint.y == 1) {
 		[point setControlPoint1:p];
-		if (isShiftDown) {
-			p.x = [point controlPoint1].x + mainTo1Diff.x;
-			p.y = [point controlPoint1].y + mainTo1Diff.y;
-			[point setMainPoint:p];
-			
-			p.x = [point mainPoint].x + mainTo2Diff.x;
-			p.y = [point mainPoint].y + mainTo2Diff.y;
-			[point setControlPoint2:p];
-		}
+		// The only point that it would make sense to change is the previous
+		// main point. But if you're going to do that, you'd also want to modify
+		// the previous point's control2 as well.
 	} else if (editingPoint.y == 2) {
 		[point setControlPoint2:p];
 		if (isShiftDown) {
-			p.x = [point controlPoint2].x - mainTo2Diff.x;
-			p.y = [point controlPoint2].y - mainTo2Diff.y;
+			p.x = [point controlPoint2].x + mainTo2Diff.x;
+			p.y = [point controlPoint2].y + mainTo2Diff.y;
 			[point setMainPoint:p];
-			
-			p.x = [point mainPoint].x - mainTo1Diff.x;
-			p.y = [point mainPoint].y - mainTo1Diff.y;
-			[point setControlPoint1:p];
 		}
 	}
 }
@@ -114,10 +112,24 @@ NSPoint NSDifferenceFromPointToPoint(NSPoint point1, NSPoint point2) {
 	editingPoint = [self locationOfPathElementNearPoint:local_point];
 	
 	if (editingPoint.x < 0) {
+		CGPoint control1 = local_point;
+		CGPoint control2 = local_point;
+		
+		BezierPoint *lastPoint = [bezierPoints lastObject];
+		if (lastPoint) {
+			NSPoint lastMain = [lastPoint mainPoint];
+
+			control1 = NSMakePoint(lastMain.x * 0.7 + local_point.x * (1 - 0.7),
+								   lastMain.y * 0.7 + local_point.y * (1 - 0.7));
+
+			control2 = NSMakePoint(lastMain.x * 0.3 + local_point.x * (1 - 0.3),
+								   lastMain.y * 0.3 + local_point.y * (1 - 0.3));
+		}
+		
 		BezierPoint *newPoint = [[BezierPoint alloc] init];
 		[newPoint setMainPoint:local_point];
-		[newPoint setControlPoint1:NSMakePoint(local_point.x - CONTROL_OFFSET, local_point.y)];
-		[newPoint setControlPoint2:NSMakePoint(local_point.x + CONTROL_OFFSET, local_point.y)];
+		[newPoint setControlPoint1:control1];
+		[newPoint setControlPoint2:control2];
 		[bezierPoints addObject:newPoint];
 		[newPoint release];
 		
@@ -156,9 +168,9 @@ NSPoint NSDifferenceFromPointToPoint(NSPoint point1, NSPoint point2) {
 		BezierPoint *bezierPoint = [bezierPoints objectAtIndex:i];
 		NSRect r;
 		if (i > 0) {
-			[extra moveToPoint:[bezierPoint controlPoint1]];
+			[extra lineToPoint:[bezierPoint controlPoint1]];
+			[extra moveToPoint:[bezierPoint controlPoint2]];
 			[extra lineToPoint:[bezierPoint mainPoint]];
-			[extra lineToPoint:[bezierPoint controlPoint2]];
 			
 			r = NSMakeRect([bezierPoint controlPoint1].x, [bezierPoint controlPoint1].y, HANDLE_WIDTH, HANDLE_HEIGHT);
 			r = NSOffsetRect(r, -HANDLE_WIDTH/2, -HANDLE_HEIGHT/2);

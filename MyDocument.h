@@ -8,15 +8,9 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "BezierView.h"
 
-@protocol BezierViewDelegate;
-@class BezierView;
-
-@interface MyDocument : NSDocument <BezierViewDelegate> {
-	NSMutableArray *bezierPoints;
-	
-	NSBezierPath * bezierPath;
-	
+@interface MyDocument : NSDocument <BezierViewDelegate> {	
 	BezierView * bezierView;
 	NSTextView * bezierCodeView;
 	NSPopUpButton *codeOption;

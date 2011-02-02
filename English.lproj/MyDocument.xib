@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="100024"/>
+			<integer value="100025"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -150,7 +150,7 @@
 														<object class="NSTextView" id="963997078">
 															<reference key="NSNextResponder" ref="623529941"/>
 															<int key="NSvFlags">2322</int>
-															<string key="NSFrameSize">{237, 91}</string>
+															<string key="NSFrame">{{0, 19}, {237, 72}}</string>
 															<reference key="NSSuperview" ref="623529941"/>
 															<object class="NSTextContainer" key="NSTextContainer" id="52366857">
 																<object class="NSLayoutManager" key="NSLayoutManager">
@@ -172,7 +172,7 @@
 																<int key="NSTCFlags">1</int>
 															</object>
 															<object class="NSTextViewSharedData" key="NSSharedData">
-																<int key="NSFlags">12261</int>
+																<int key="NSFlags">12069</int>
 																<int key="NSTextCheckingTypes">0</int>
 																<nil key="NSMarkedAttributes"/>
 																<object class="NSColor" key="NSBackgroundColor" id="464321382">
@@ -556,9 +556,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{172, 168}, {828, 518}}</string>
+					<string>{{329, 168}, {828, 518}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{172, 168}, {828, 518}}</string>
+					<string>{{329, 168}, {828, 518}}</string>
 					<integer value="1"/>
 					<string>{{201, 387}, {507, 413}}</string>
 					<integer value="1"/>

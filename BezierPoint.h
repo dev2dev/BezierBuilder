@@ -13,8 +13,8 @@
 
 }
 
-@property CGPoint mainPoint;
-@property CGPoint controlPoint1;
-@property CGPoint controlPoint2;
+@property NSPoint mainPoint;
+@property NSPoint controlPoint1;
+@property NSPoint controlPoint2;
 
 @end

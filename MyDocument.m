@@ -7,7 +7,6 @@
 //
 
 #import "MyDocument.h"
-#import "BezierView.h"
 #import "BezierPoint.h"
 
 #import "CodeBuilder.h"
@@ -23,54 +22,23 @@
 	
 	Class builder = [[codeOption selectedItem] representedObject];
 		
-	[bezierCodeView setString:[builder codeForBezierPoints:bezierPoints]];
+	[bezierCodeView setString:[builder codeForBezierPoints:[bezierView bezierPoints]]];
 }
 
 - (void) codeOptionChanged:(id)sender {
 	[self rebuildSteps];
 }
 
-- (void) didChangeElementAtIndex:(NSPoint)index byDelta:(NSPoint)point {
-	// Get the current points for the curve.
-    NSPoint points[3];
-    NSBezierPathElement element = [bezierPath elementAtIndex:index.x associatedPoints:points];
-	int elemIndex = (element == NSCurveToBezierPathElement ? (int)index.y : 0);
-	if (elemIndex >= 0) {
-		NSLog(@"%f,%f    %f,%f    %f,%f", points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
-		points[elemIndex] = NSPointAddToPoint(points[elemIndex], point);;
-	} else {
-		for (int i = 0; i < 3; ++i) {
-			points[i] = NSPointAddToPoint(points[i], point);
-		}
-	}
-	
-    // Update the points.
-    [bezierPath setAssociatedPoints:points atIndex:index.x];
+- (void) elementsDidChangeInBezierView:(BezierView *)view {
 	[self rebuildSteps];
 	[bezierView setNeedsDisplay:YES];
-}
-
-- (void) didAddPoints:(NSPointArray)points {
-	BezierPoint *point = [[BezierPoint alloc] init];
-	[point setMainPoint:points[0]];
-	[point setControlPoint1:points[1]];
-	[point setControlPoint2:points[2]];
-	[bezierPoints addObject:point];
-	[point release];
-	
-	[self rebuildSteps];
-	[bezierView setNeedsDisplay:YES];
-}
-
-- (NSBezierPath *) path {
-	return [NSBezierPathCodeBuilder objectForBezierPoints:bezierPoints];
 }
 
 - (id)init
 {
     self = [super init];
     if (self) {
-		bezierPoints = [[NSMutableArray alloc] init];    
+ 
     }
     return self;
 }

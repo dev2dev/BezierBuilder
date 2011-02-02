@@ -8,25 +8,23 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class BezierPoint;
+@class BezierView;
 
 @protocol BezierViewDelegate
 
-- (void) didChangeElementAtIndex:(NSPoint)index byDelta:(NSPoint)point;
-- (void) didAddPoints:(NSPointArray)points;
-- (NSBezierPath *) path;
+- (void) elementsDidChangeInBezierView:(BezierView *)bezierView;
 
 @end
 
 
 @interface BezierView : NSView {
-	IBOutlet id<BezierViewDelegate> delegate;
+	NSMutableArray *bezierPoints;
 	NSPoint editingPoint;
-	NSPoint previousPoint;
 	
-	BOOL isShiftDown;
+	IBOutlet id<BezierViewDelegate> delegate;
 }
 
 @property (nonatomic, assign) id<BezierViewDelegate> delegate;
+@property (nonatomic, readonly) NSArray * bezierPoints;
 
 @end

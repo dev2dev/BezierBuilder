@@ -1,0 +1,15 @@
+//
+// Prefix header for all source files of the 'BezierBuilder' target in the 'BezierBuilder' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+
+static NSPoint NSPointAddToPoint(NSPoint p1, NSPoint p2) {
+	return NSMakePoint(p1.x+p2.x, p1.y+p2.y);
+}
+
+static NSPoint NSPointSubtractPoint(NSPoint p1, NSPoint p2) {
+	return NSMakePoint(p1.x-p2.x, p1.y-p2.y);
+}
+#endif

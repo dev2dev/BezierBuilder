@@ -30,7 +30,7 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 	return YES;
 }
 
-#define NEAR_THRESHOLD 7
+#define NEAR_THRESHOLD 15
 
 - (NSPoint) locationOfPathElementNearPoint:(NSPoint)aPoint {
 	NSPoint closest = NSMakePoint(-1, -1);
@@ -168,6 +168,7 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 		BezierPoint *bezierPoint = [bezierPoints objectAtIndex:i];
 		NSRect r;
 		if (i > 0) {
+			[extra moveToPoint:[[bezierPoints objectAtIndex:i-1] mainPoint]];
 			[extra lineToPoint:[bezierPoint controlPoint1]];
 			[extra moveToPoint:[bezierPoint controlPoint2]];
 			[extra lineToPoint:[bezierPoint mainPoint]];

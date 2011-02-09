@@ -16,6 +16,11 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 	return sqrt(dx2 + dy2);
 }
 
+NSPoint NSInterpolatePoints(NSPoint point1, NSPoint point2, float amount) {
+	return NSMakePoint(point1.x * (1-amount) + point2.x * amount,
+					   point1.y * (1-amount) + point2.y * amount);
+}
+
 
 @implementation BezierView
 
@@ -30,7 +35,7 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 	return YES;
 }
 
-#define NEAR_THRESHOLD 15
+#define NEAR_THRESHOLD 10
 
 - (NSPoint) locationOfPathElementNearPoint:(NSPoint)aPoint {
 	NSPoint closest = NSMakePoint(-1, -1);
@@ -65,10 +70,17 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 - (void) updateEditingPointWithPoint:(NSPoint)p withEvent:(NSEvent *)event {
 	BezierPoint *point = [bezierPoints objectAtIndex:editingPoint.x];
 	
-	if (editingPoint.y <= 0) {
-		NSPoint diff = NSPointSubtractPoint(p, [point mainPoint]);
+	if (editingPoint.y == -1) {
+		[point setMainPoint:p];
+		NSPoint c1 = [point controlPoint1];
+		
+		NSPoint newC2 = NSInterpolatePoints(c1, p, 0.7);
+		[point setControlPoint2:newC2];
+	}
+	else if (editingPoint.y == 0) {
 		[point setMainPoint:p];
 
+		NSPoint diff = NSPointSubtractPoint(p, [point mainPoint]);
 		NSPoint newPoint = NSPointAddToPoint(diff, [point controlPoint2]);
 		[point setControlPoint2:newPoint];
 		
@@ -103,11 +115,8 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 			// trajectory of the previous segment makes no sense
 			NSPoint prevMain = [lastPoint mainPoint];
 			
-			control1 = NSMakePoint(prevMain.x * 0.7 + local_point.x * (1 - 0.7),
-								   prevMain.y * 0.7 + local_point.y * (1 - 0.7));
-			
-			control2 = NSMakePoint(prevMain.x * 0.3 + local_point.x * (1 - 0.3),
-								   prevMain.y * 0.3 + local_point.y * (1 - 0.3));
+			control1 = NSInterpolatePoints(prevMain, local_point, 0.3);
+			control2 = NSInterpolatePoints(prevMain, local_point, 0.7);
 		}
 		else if (pointCount > 1) {
 			NSPoint prevC2 = [lastPoint controlPoint2];
@@ -116,8 +125,7 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 			NSPoint trajectory = NSPointSubtractPoint(prevMain, prevC2);
 			control1 = NSPointAddToPoint(prevMain, trajectory);
 			
-			control2 = NSMakePoint(control1.x * 0.5 + local_point.x * (1 - 0.5),
-								   control1.y * 0.5 + local_point.y * (1 - 0.5));
+			control2 = NSInterpolatePoints(control1, local_point, 0.5);
 		}
 		
 		BezierPoint *newPoint = [[BezierPoint alloc] init];
@@ -152,7 +160,7 @@ float NSDistanceFromPointToPoint(NSPoint point1, NSPoint point2) {
 #define HANDLE_HEIGHT 5
 
 - (void)drawRect:(NSRect)dirtyRect {
-	[[[NSColor redColor] colorWithAlphaComponent:0.7] set];
+	[[[NSColor redColor] colorWithAlphaComponent:0.6] set];
 	NSBezierPath * extra = [[NSBezierPath alloc] init];
 	for (NSUInteger i = 0; i < [bezierPoints count]; ++i) {
 		BezierPoint *bezierPoint = [bezierPoints objectAtIndex:i];

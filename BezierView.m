@@ -83,10 +83,19 @@ NSPoint NSScaledPoint(NSPoint point, float scale) {
 	
 	if (editingPoint.y == -1) {
 		[point setMainPoint:p];
-		NSPoint c1 = [point controlPoint1];
 		
-		NSPoint newC2 = NSInterpolatePoints(c1, p, 0.5);
-		[point setControlPoint2:newC2];
+		if (editingPoint.x > 0) {
+			NSPoint c1 = [point controlPoint1];
+			
+			BezierPoint *prevPoint = [bezierPoints objectAtIndex:editingPoint.x - 1];
+			NSPoint prevOrigin = [prevPoint mainPoint];
+			
+			NSPoint trajectory = NSPointSubtractPoint(c1, prevOrigin);
+			NSPoint thingToPointBackAt = NSPointAddToPoint(c1, NSScaledPoint(trajectory, 0.5));
+			
+			NSPoint newC2 = NSInterpolatePoints(thingToPointBackAt, p, 0.33);
+			[point setControlPoint2:newC2];
+		}
 	}
 	else if (editingPoint.y == 0) {
 		NSPoint diff = NSPointSubtractPoint(p, [point mainPoint]);
@@ -155,7 +164,11 @@ NSPoint NSScaledPoint(NSPoint point, float scale) {
 			NSPoint prevMain = [lastPoint mainPoint];
 			
 			control1 = NSInterpolatePoints(prevMain, local_point, 0.3);
-			control2 = NSInterpolatePoints(control1, local_point, 0.5);
+			
+			NSPoint trajectory = NSPointSubtractPoint(control1, prevMain);
+			NSPoint thingToPointBackAt = NSPointAddToPoint(control1, NSScaledPoint(trajectory, 0.5));
+			
+			control2 = NSInterpolatePoints(thingToPointBackAt, local_point, 0.33);
 		}
 		else if (pointCount > 1) {
 			NSPoint prevC2 = [lastPoint controlPoint2];

@@ -195,6 +195,17 @@ NSPoint NSScaledPoint(NSPoint point, float scale) {
 	[[self delegate] elementsDidChangeInBezierView:self];
 }
 
+- (void)deleteBackward:(id)sender {
+	if ([bezierPoints count] > 0) {
+		[bezierPoints removeLastObject];
+		[[self delegate] elementsDidChangeInBezierView:self];
+	}
+}
+
+- (void)keyDown:(NSEvent *)theEvent {
+	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+}
+
 #define HANDLE_WIDTH 5
 #define HANDLE_HEIGHT 5
 

@@ -12,7 +12,8 @@
 
 @implementation CGPathRefCodeBuilder
 
-+ (NSString *) codeForBezierPoints:(NSArray *)points {
+- (NSString *) codeForBezierPoints {
+	NSArray *points = [self effectiveBezierPoints];
 	NSMutableArray *lines = [NSMutableArray array];
 	
 	[lines addObject:@"CGMutablePathRef path = CGPathCreateMutable();"];

@@ -38,11 +38,21 @@ NSPoint NSScaledPoint(NSPoint point, float scale) {
 - (void) awakeFromNib {
 	bezierPoints = [[NSMutableArray alloc] init];
 	editingPoint = NSMakePoint(-1, -1);
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(frameChanged:)
+												 name:NSViewFrameDidChangeNotification
+											   object:self];
 }
 
 - (BOOL)acceptsFirstResponder {
 	return YES;
 }
+
+- (void)frameChanged:(NSNotification *)note {
+	[[self delegate] elementsDidChangeInBezierView:self];
+}
+
 
 #define NEAR_THRESHOLD 10
 
@@ -177,7 +187,9 @@ NSPoint NSScaledPoint(NSPoint point, float scale) {
 			NSPoint trajectory = NSPointSubtractPoint(prevMain, prevC2);
 			control1 = NSPointAddToPoint(prevMain, trajectory);
 			
-			control2 = NSInterpolatePoints(control1, local_point, 0.5);
+			NSPoint thingToPointBackAt = NSPointAddToPoint(control1, NSScaledPoint(trajectory, 0.5));
+			
+			control2 = NSInterpolatePoints(thingToPointBackAt, local_point, 0.33);
 		}
 		
 		BezierPoint *newPoint = [[BezierPoint alloc] init];
@@ -251,7 +263,9 @@ NSPoint NSScaledPoint(NSPoint point, float scale) {
 	[extra release];
 	
 	[[NSColor blackColor] set];
-	NSBezierPath * path = [NSBezierPathCodeBuilder objectForBezierPoints:bezierPoints];
+	NSBezierPathCodeBuilder *builder = [[NSBezierPathCodeBuilder alloc] init];
+	[builder setBezierPoints:bezierPoints];
+	NSBezierPath * path = [builder objectForBezierPoints];
 	[path stroke];
 }
 

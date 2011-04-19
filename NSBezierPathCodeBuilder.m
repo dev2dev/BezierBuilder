@@ -11,7 +11,9 @@
 
 @implementation NSBezierPathCodeBuilder
 
-+ (NSString *) codeForBezierPoints:(NSArray *)points {
+- (NSString *) codeForBezierPoints {
+	NSArray *points = [self effectiveBezierPoints];
+	
 	NSMutableArray *lines = [NSMutableArray array];
 	
 	[lines addObject:@"NSBezierPath *bp = [[NSBezierPath alloc] init];"];
@@ -33,7 +35,8 @@
 	return [lines componentsJoinedByString:@"\n"];
 }
 
-+ (id) objectForBezierPoints:(NSArray *)points {
+- (id) objectForBezierPoints {
+	NSArray *points = [self effectiveBezierPoints];
 	NSBezierPath *bp = [[NSBezierPath alloc] init];
 	for (NSUInteger i = 0; i < [points count]; ++i) {
 		BezierPoint *point = [points objectAtIndex:i];

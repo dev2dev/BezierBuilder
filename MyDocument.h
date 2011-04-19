@@ -14,11 +14,16 @@
 	BezierView * bezierView;
 	NSTextView * bezierCodeView;
 	NSPopUpButton *codeOption;
+	NSSegmentedControl *originControl;
+	NSSegmentedControl *codeStyleControl;
 }
 
 @property (nonatomic, retain) IBOutlet BezierView * bezierView;
 @property (nonatomic, retain) IBOutlet NSTextView * bezierCodeView;
 @property (nonatomic, retain) IBOutlet NSPopUpButton *codeOption;
+
+@property (assign) IBOutlet NSSegmentedControl *originControl;
+@property (assign) IBOutlet NSSegmentedControl *codeStyleControl;
 
 - (IBAction) codeOptionChanged:(id)sender;
 

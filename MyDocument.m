@@ -17,12 +17,29 @@
 
 @synthesize bezierView, bezierCodeView;
 @synthesize codeOption;
+@synthesize originControl;
+@synthesize codeStyleControl;
 
 - (void) rebuildSteps {
 	
-	Class builder = [[codeOption selectedItem] representedObject];
-		
-	[bezierCodeView setString:[builder codeForBezierPoints:[bezierView bezierPoints]]];
+	Class builderClass = Nil;
+	if ([codeStyleControl selectedSegment] == 0) {
+		builderClass = [NSBezierPathCodeBuilder class];
+	}
+	else {
+		builderClass = [CGPathRefCodeBuilder class];
+	}
+	
+	CodeBuilder *builder = [[builderClass alloc] init];
+	[builder setBezierPoints:[bezierView bezierPoints]];
+	if ([originControl selectedSegment] == 1) {
+		[builder setYOrigin:[bezierView bounds].size.height];
+	}
+	else {
+		[builder setYOrigin:0.0];
+	}
+	[bezierCodeView setString:[builder codeForBezierPoints]];
+	[builder release];
 }
 
 - (void) codeOptionChanged:(id)sender {
@@ -54,18 +71,6 @@
 {
     [super windowControllerDidLoadNib:aController];
     // Add any code here that needs to be executed once the windowController has loaded the document's window.
-	
-	[codeOption removeAllItems];
-	
-	[codeOption addItemWithTitle:@"NSBezierPath"];
-	NSMenuItem *item = [codeOption lastItem];
-	[item setRepresentedObject:[NSBezierPathCodeBuilder class]];
-	
-	[codeOption addItemWithTitle:@"CGMutablePathRef"];
-	item = [codeOption lastItem];
-	[item setRepresentedObject:[CGPathRefCodeBuilder class]];
-	
-	[codeOption selectItemAtIndex:0];
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
